@@ -1,5 +1,6 @@
 
 import { verify_token } from "@middlewares/verify-token";
+import { cartRouter } from "@modules/cart/routes";
 import { categoryRouter } from "@modules/category/routes";
 import { productRouter } from "@modules/product/routes";
 import { Router } from "express";
@@ -12,6 +13,7 @@ router.use(verify_token)
 
 router.use('/products', productRouter)
 router.use('/category', categoryRouter)
+router.use('/cart', cartRouter)
 
 
 export default router
