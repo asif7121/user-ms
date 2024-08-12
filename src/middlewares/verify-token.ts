@@ -16,9 +16,6 @@ export const verify_token = async (req: Request, res: Response, next: NextFuncti
 		if (!user) {
 			return res.status(400).json({ error: 'Invalid user' })
 		}
-		if (user.role !== 'user') {
-			return res.status(401).json({error:'Unauthorized access.'})
-		}
 		req.user = user
 		next()
 	} catch (error) {

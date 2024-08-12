@@ -17,7 +17,10 @@ export const addProductToCart = async (req: Request, res: Response) => {
         const {quantity} = req.body
         if (productId && bundleId) {
             return res.status(400).json({error:'Cannot add product and bundle at same time.'})
-        }
+		}
+		if (!productId && !bundleId) {
+			return res.status(400).json({ error: 'Please provide product to add in the cart.' })
+		}
 		if (!quantity || isNaN(quantity) || quantity <= 0) {
 			return res.status(400).json({ error: 'Please provide a valid quantity.' })
         }
@@ -117,9 +120,7 @@ export const addProductToCart = async (req: Request, res: Response) => {
 
 			await cart.save()
         }
-        if (!productId && !bundleId) {
-            return res.status(400).json({ error: 'Please provide product to add in the cart.' })
-        }
+        
 		return res.status(200).json({ success: true, data: cart })
 	} catch (error) {
 		console.error(error)

@@ -12,7 +12,7 @@ export const updateCart =  async (req: Request, res: Response) => {
         const { productId } = req.query
         const { quantity } = req.body
 
-        if (quantity < 1) {
+        if (quantity < 1 || isNaN(quantity)) {
             return res.status(400).json({ message: 'Quantity must be at least 1' })
         }
 
@@ -32,7 +32,7 @@ export const updateCart =  async (req: Request, res: Response) => {
 
         // Update the quantity and totalPrice of the item
         item.quantity = quantity
-        item.totalPrice = item.productPrice * quantity
+        item.totalPrice = item.productPrice * item.quantity
 
         // Save the updated cart
         await cart.save()
@@ -41,6 +41,6 @@ export const updateCart =  async (req: Request, res: Response) => {
         res.status(200).json({ message: 'Cart updated successfully', cart: cart })
     } catch (error) {
         console.error(error)
-        res.status(500).json({ message: 'Server error', error })
+        res.status(500).json({error: error.message })
     }
 }
