@@ -25,20 +25,8 @@ export const getWishlist = async (req: Request, res: Response) => {
 				},
 			},
 			{
-				$unwind: {
-					path: '$items._products',
-					preserveNullAndEmptyArrays: true,
-				},
-			},
-			{
-				$unwind: {
-					path: '$items._bundles',
-					preserveNullAndEmptyArrays: true,
-				},
-			},
-			{
 				$lookup: {
-					from: 'products', 
+					from: 'products',
 					localField: 'items._products',
 					foreignField: '_id',
 					as: 'productDetails',
@@ -46,25 +34,39 @@ export const getWishlist = async (req: Request, res: Response) => {
 			},
 			{
 				$lookup: {
-					from: 'bundles', 
+					from: 'bundles',
 					localField: 'items._bundles',
 					foreignField: '_id',
 					as: 'bundleDetails',
 				},
 			},
 			{
-				$group: {
-					_id: '$_id',
-					_user: { $first: '$_user' },
-					name: { $first: '$name' },
-					isPublic: { $first: '$isPublic' },
-					isDeleted: { $first: '$isDeleted' },
-					items: {
-						$push: {
-							_products: '$items._products',
-							productDetails: { $arrayElemAt: ['$productDetails', 0] },
-							_bundles: '$items._bundles',
-							bundleDetails: { $arrayElemAt: ['$bundleDetails', 0] },
+				$project: {
+					_id: 1,
+					_user: 1,
+					name: 1,
+					isPublic: 1,
+					isDeleted: 1,
+					products: {
+						$map: {
+							input: '$productDetails',
+							as: 'product',
+							in: {
+								_id: '$$product._id',
+								name: '$$product.name',
+								price: '$$product.price',
+							},
+						},
+					},
+					bundles: {
+						$map: {
+							input: '$bundleDetails',
+							as: 'bundle',
+							in: {
+								_id: '$$bundle._id',
+								name: '$$bundle.name',
+								price: '$$bundle.price',
+							},
 						},
 					},
 				},

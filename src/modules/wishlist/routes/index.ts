@@ -5,7 +5,11 @@ import {
 	addBundleToWishlist,
 	removeBundleFromWishlist,
 	removeProductFromWishlist,
-	updateWishlist,
+    updateWishlist,
+    getWishlist,
+    getAllWishlist,
+    deleteWishlist,
+    emptyWishlist,
 } from '@modules/wishlist/controller'
 
 
@@ -19,6 +23,10 @@ router.patch('/add-bundle', addBundleToWishlist)
 router.patch('/remove-bundle', removeBundleFromWishlist)
 router.patch('/remove-product', removeProductFromWishlist)
 router.patch('/update', updateWishlist)
+router.get('/get-details', getWishlist)
+router.get('/get-all', getAllWishlist)
+router.patch('/delete', deleteWishlist)
+router.patch('/empty', emptyWishlist)
 
 
 
