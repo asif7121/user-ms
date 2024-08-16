@@ -6,11 +6,11 @@ export const removeAllProductFromCart = async (req: Request, res: Response) => {
 		const { _id } = req.user
 
 		// Find the user's cart
-		let cart = await Cart.findOne({ _user: _id })
+		const cart = await Cart.findOne({ _user: _id })
 
-		// If the cart does not exist, return an empty array
+		// If the cart does not exist
 		if (!cart || cart.items.length === 0) {
-			return res.status(200).json({ error: 'Your cart is already empty' })
+			return res.status(400).json({ error: 'Your cart is already empty' })
 		}
 		// Clear the cart
 		cart.items = []

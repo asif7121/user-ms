@@ -1,3 +1,4 @@
+import { Bundle } from "@models/bundle";
 import { Product } from "@models/product";
 import { Wishlist } from "@models/wishlist";
 import { Request, Response } from "express";
@@ -11,43 +12,110 @@ import { isValidObjectId } from "mongoose";
 
 export const addProductToWishlist = async (req: Request, res: Response) => {
     try {
-        const { _id } = req.user
-        const { productId, wishlistId } = req.query
-        if (!isValidObjectId(productId)) {
-            return res.status(400).json({ error: 'Invalid product id.' })
-        }
-        if (!isValidObjectId(wishlistId)) {
-            return res.status(400).json({ error: 'Invalid wishlist id.' })
-        }
-        const product = await Product.findById(productId)
-        if (!product) {
-			return res.status(404).json({ error: 'Product not found.' })
+		const { _id } = req.user
+		const { productId, bundleId }: any = req.query
+		
+		if (productId && bundleId) {
+			return res.status(400).json({ error: 'Cannot add product and bundle at same time.' })
 		}
-		if (product.isDeleted) {
-			return res.status(400).json({ error: 'Product is deleted.' })
+		if (!productId && !bundleId) {
+			return res.status(400).json({ error: 'Please provide product to add in the cart.' })
 		}
-		if (product.isBlocked) {
-			return res.status(400).json({ error: 'Product is blocked.' })
-		}
-        const wishlist: any = await Wishlist.findOne({ _user: _id, _id: wishlistId })
-        if (!wishlist) {
-            return res.status(404).json({error:'Wishlist not found.'})
-        }
-        if (wishlist.isDeleted) {
-            return res.status(400).json({ error: 'Wishlist is deleted.' })
-        }
-         const productExists = wishlist.items?._products.some(
-				(id) => id.toString() === productId
-			)
-			if (productExists) {
-				return res.status(400).json({ error: 'Product is already in the wishlist.' })
+
+		// Find the user's wishlist or create a new one
+		let wishlist: any = await Wishlist.findOne({ _user: _id })
+		if (productId) {
+			if (!isValidObjectId(productId)) {
+				return res.status(400).json({ error: 'Invalid product Id.' })
 			}
-			// Add the product to the wishlist
-			wishlist.items?._products.push(product._id)
+			const product = await Product.findOne({
+				_id: productId,
+				isBlocked: false,
+				isDeleted: false,
+			})
+			if (!product) {
+				return res.status(404).json({ error: 'Product not found.' })
+			}
+			if (!wishlist) {
+				wishlist = new Wishlist({
+					_user: _id,
+					items: [
+						{
+							productId: product._id,
+							productName: product.name,
+							productPrice: product.price,
+						},
+					],
+				})
+				await wishlist.save()
+			} else {
+				const items = wishlist.items.find(
+					(item) => item.productId.toString() === productId
+				)
+
+				if (items) {
+					return res.status(400).json({error:'This item is already added in your wishlist.'})
+				} else {
+					// If the product is not in the wishlist, add it as a new item
+					wishlist.items.push({
+						productId: product._id,
+						productName: product.name,
+						productPrice: product.price,
+					})
+				}
+			}
+
 			await wishlist.save()
-			return res.status(200).json({success:true, data: wishlist })
-    } catch (error) {
-        console.error(error)
+		} else if (bundleId) {
+			if (!isValidObjectId(bundleId)) {
+				return res.status(400).json({ error: 'Invalid bundle Id.' })
+			}
+			const bundle = await Bundle.findOne({
+				_id: bundleId,
+				isBlocked: false,
+				isDeleted: false,
+			})
+			if (!bundle) {
+				return res.status(404).json({ error: 'Bundle not found.' })
+			}
+			if (!wishlist) {
+				wishlist = new Wishlist({
+					_user: _id,
+					items: [
+						{
+							productId: bundle._id,
+							productName: bundle.name,
+							productPrice: bundle.price,
+						},
+					],
+				})
+				await wishlist.save()
+			} else {
+				const item = wishlist.items.find(
+					(item) => item.productId.toString() === bundleId
+				)
+
+				if (item) {
+					return res
+						.status(400)
+						.json({ error: 'This item is already added in your wishlist.' })
+				
+				} else {
+					// If the product is not in the wishlist, add it as a new item
+					wishlist.items.push({
+						productId: bundle._id,
+						productName: bundle.name,
+						productPrice: bundle.price,
+					})
+				}
+			}
+
+			await wishlist.save()
+		}
+
+		return res.status(200).json({ success: true, data: wishlist })
+	} catch (error) {
+		console.error(error)
 		res.status(500).json({ error: error.message })
-    }
+	}
 }
