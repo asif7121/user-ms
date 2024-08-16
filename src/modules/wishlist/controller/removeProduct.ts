@@ -6,47 +6,26 @@ import { isValidObjectId } from 'mongoose'
 export const removeProductFromWishlist = async (req: Request, res: Response) => {
 	try {
 		const { _id } = req.user
-		const { productId, wishlistId } = req.query
-
-		// Validate productId and wishlistId
+		const { productId }: any = req.query
 		if (!isValidObjectId(productId)) {
-			return res.status(400).json({ error: 'Invalid product id.' })
+			return res.status(400).json({ error: 'Invalid Product Id.' })
 		}
-		if (!isValidObjectId(wishlistId)) {
-			return res.status(400).json({ error: 'Invalid wishlist id.' })
-		}
-
-		// Check if the product exists
-		const product = await Product.findById(productId)
-		if (!product) {
-			return res.status(404).json({ error: 'Product not found.' })
-		}
-
-		// Find the wishlist
-		const wishlist: any = await Wishlist.findOne({ _user: _id, _id: wishlistId })
+		let wishlist:any = await Wishlist.findOne({ _user: _id })
 		if (!wishlist) {
 			return res.status(404).json({ error: 'Wishlist not found.' })
 		}
-		if (wishlist.isDeleted) {
-			return res.status(400).json({ error: 'Wishlist is deleted.' })
+		if (wishlist.items.length === 0) {
+			return res.status(400).json({ error: 'Your wishlist is empty.' })
 		}
 
-		// Check if the product is in the wishlist
-		const productExists = wishlist.items?._products?.some(
-			(id) => id.toString() === productId
-		)
+		// Check if the product exists in the cart
+		const productExists = wishlist.items.some((item) => item.productId.toString() === productId)
 		if (!productExists) {
-			return res.status(400).json({ error: 'Product is not in the wishlist.' })
+			return res.status(400).json({ error: 'Your cart does not contain this product.' })
 		}
-		// Remove the product from the wishlist
-		wishlist.items._products = wishlist.items?._products.filter(
-			(id) => id.toString() !== productId
-		)
+		wishlist.items = wishlist.items.filter((p) => p.productId.toString() !== productId)
 		await wishlist.save()
-
-		return res
-			.status(200)
-			.json({ success: true, message: 'Product removed from wishlist.', data: wishlist })
+		return res.status(200).json({ success: true, data: wishlist })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: error.message })

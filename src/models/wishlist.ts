@@ -2,33 +2,25 @@ import { Document, model, Schema } from "mongoose";
 
 
 interface IItems extends Document {
-	_products: [Schema.Types.ObjectId]
-	_bundles: [Schema.Types.ObjectId]
+	productId: Schema.Types.ObjectId
+	productName: string
+	productPrice: number
 }
 
 interface IWishlist extends Document {
 	_user: Schema.Types.ObjectId
-	items?: IItems
+	items?: [IItems]
 	name: string
 	isPublic: boolean
-	isDeleted: boolean
 }
-const itemSchema = new Schema<IItems>({
-	_products: [
-		{
-			type: Schema.Types.ObjectId,
-			ref: 'Product',
-			default: undefined,
-		},
-	],
-	_bundles: [
-		{
-			type: Schema.Types.ObjectId,
-			ref: 'Bundle',
-			default: undefined,
-		},
-	],
-},{_id:false})
+const itemSchema = new Schema<IItems>(
+	{
+		productId: { type: Schema.Types.ObjectId },
+		productName: { type: String },
+		productPrice: { type: Number },
+	},
+	{ _id: false }
+)
 
 const wishlistSchema = new Schema<IWishlist>(
 	{
@@ -37,12 +29,8 @@ const wishlistSchema = new Schema<IWishlist>(
 			ref: 'User',
 			required: true,
 		},
-		items: itemSchema,
+		items: [itemSchema],
 		isPublic: {
-			type: Boolean,
-			default: false,
-		},
-		isDeleted: {
 			type: Boolean,
 			default: false,
 		},
