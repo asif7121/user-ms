@@ -13,7 +13,7 @@ interface IBundle extends Document {
 	_createdBy: Schema.Types.ObjectId
 }
 
-const bundleSchema: Schema = new Schema(
+const bundleSchema: Schema = new Schema<IBundle>(
 	{
 		name: {
 			type: String,

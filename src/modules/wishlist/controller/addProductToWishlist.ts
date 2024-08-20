@@ -19,7 +19,7 @@ export const addProductToWishlist = async (req: Request, res: Response) => {
 			return res.status(400).json({ error: 'Cannot add product and bundle at same time.' })
 		}
 		if (!productId && !bundleId) {
-			return res.status(400).json({ error: 'Please provide product to add in the cart.' })
+			return res.status(400).json({ error: 'Please provide product to add in the wishlist.' })
 		}
 
 		// Find the user's wishlist or create a new one

@@ -18,10 +18,10 @@ export const removeProductFromWishlist = async (req: Request, res: Response) => 
 			return res.status(400).json({ error: 'Your wishlist is empty.' })
 		}
 
-		// Check if the product exists in the cart
+		// Check if the product exists in the wishlist
 		const productExists = wishlist.items.some((item) => item.productId.toString() === productId)
 		if (!productExists) {
-			return res.status(400).json({ error: 'Your cart does not contain this product.' })
+			return res.status(400).json({ error: 'Your wishlist does not contain this product.' })
 		}
 		wishlist.items = wishlist.items.filter((p) => p.productId.toString() !== productId)
 		await wishlist.save()

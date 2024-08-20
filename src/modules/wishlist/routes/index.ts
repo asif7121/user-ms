@@ -5,7 +5,9 @@ import {
     updateWishlist,
     getWishlist,
     emptyWishlist,
+    addToCartFromWishlist,
 } from '@modules/wishlist/controller'
+
 
 
 
@@ -17,6 +19,7 @@ router.patch('/remove-product', removeProductFromWishlist)
 router.patch('/update', updateWishlist)
 router.get('/get-details', getWishlist)
 router.patch('/empty', emptyWishlist)
+router.patch('/add-to-cart', addToCartFromWishlist)
 
 
 

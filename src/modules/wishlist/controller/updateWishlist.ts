@@ -1,6 +1,6 @@
 import { Wishlist } from '@models/wishlist'
 import { Request, Response } from 'express'
-import { isValidObjectId } from 'mongoose'
+
 
 export const updateWishlist = async (req: Request, res: Response) => {
 	try {

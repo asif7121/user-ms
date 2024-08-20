@@ -1,3 +1,4 @@
+import { addToCartFromWishlist } from './addToCartFromWishlist';
 import { getWishlist } from './getWishlist';
 import { emptyWishlist } from './emptyWishlist';
 import { updateWishlist } from './updateWishlist';
@@ -14,5 +15,6 @@ export {
 	removeProductFromWishlist,
 	updateWishlist,
     emptyWishlist,
-    getWishlist,
+	getWishlist,
+	addToCartFromWishlist
 }

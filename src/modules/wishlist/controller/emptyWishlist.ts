@@ -1,16 +1,10 @@
 import { Wishlist } from '@models/wishlist'
 import { Request, Response } from 'express'
-import { isValidObjectId } from 'mongoose'
+
 
 export const emptyWishlist = async (req: Request, res: Response) => {
 	try {
 		const { _id } = req.user
-		const { wishlistId } = req.query
-		// Validate wishlistId
-		if (!isValidObjectId(wishlistId)) {
-			return res.status(400).json({ error: 'Invalid wishlist id.' })
-		}
-		
 		const wishlist:any = await Wishlist.findOne({_user: _id})
 		if (!wishlist) {
 			return res.status(404).json({ error: 'Wishlist not found.' })
