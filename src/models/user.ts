@@ -1,5 +1,15 @@
 import { Document, Schema, model } from 'mongoose'
 
+
+interface Iaddress {
+	street: string
+	area: string
+	city: string
+	zipcode: string
+	state: string
+	country: string
+}
+
 export interface IAuth extends Document {
 	username: string
 	password: string
@@ -15,7 +25,7 @@ export interface IAuth extends Document {
 	authMethod: 'email' | 'phone' | 'authenticator'
 	isTwoFAEnabled?: boolean
 	resetPasswordToken?: string
-	address?: [object]
+	address?: [Iaddress]
 	role: 'user' | 'seller'
 	dob: Date
 	tempEmail?: string
